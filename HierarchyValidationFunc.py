@@ -8,18 +8,18 @@ plot_dir = '/Users/isobel/Desktop/DUNE/2026/PandoraValidation/HierarchyValPlots/
 ##############################################################################################
 ##############################################################################################
 
-def CreateHierarchyTableMetrics(int_masks, tier_masks, pdg_masks, hierarchy_branches, pfp_branches, demand_parent_has_match, split_by_pdg) :
+def CreateHierarchyTableMetrics(int_masks, tier_masks, pfp_target_mask, pfp_reco_mask, pdg_masks, hierarchy_branches, pfp_branches, demand_parent_has_match, split_by_pdg) :
 
     # Cache awkward arrays locally
     mc_tier      = hierarchy_branches['MC_HierarchyTier']
     bm_tier      = hierarchy_branches['BM_HierarchyTier']
     mc_parent    = hierarchy_branches['MC_ParentIndex']
     bm_parent    = hierarchy_branches['BM_ParentIndex']
-    mc_has_match = pfp_branches['MCP_HasMatch']
+    mc_has_match = pfp_target_mask & pfp_reco_mask
     
     for int_type in Definitions.ints :
     
-        file_name = f'HierarchyMetricTables_{Definitions.ints[int_type]}' + ('_PDG' if split_by_pdg else '') + ('_YesDemandParentRecod' if demand_parent_has_match else 'NotDemandParentRecod')
+        file_name = f'HierarchyMetricTables_{Definitions.int_file_strings[int_type]}' + ('_PDG' if split_by_pdg else '') + ('_YesDemandParentRecod' if demand_parent_has_match else '_NotDemandParentRecod')
         
         with open(f'{plot_dir}{file_name}.txt', "w") as f:
         
