@@ -66,7 +66,23 @@ def CreateGraphs(plot_dir_path, config_target_mask, config_reco_mask, tier_masks
                         plt.close(fig)
                         file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
                         fig.savefig(f'{plot_dir_path}/BM/{ValidationFunc.PFP_BM_plotting_vars[i_var].tree_name}/{file_name}.pdf', bbox_inches='tight')                             
-        
+                    # Plot ALT_var distributions                        
+                    for i_var in range(len(ValidationFunc.PFP_ALT_plotting_vars)) :
+                        fig, ax = plt.subplots()
+                        ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, ValidationFunc.PFP_ALT_plotting_vars[i_var])
+                        ValidationFunc.PlotVariable(target_mask, pfp_branches, ValidationFunc.PFP_ALT_plotting_vars[i_var], ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
+                        plt.close(fig)
+                        file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
+                        fig.savefig(f'{plot_dir_path}/ALT/{ValidationFunc.PFP_ALT_plotting_vars[i_var].tree_name}/{file_name}.pdf', bbox_inches='tight')  
+                        # Now segment
+                        for seg_var in ValidationFunc.ALT_seg_vars :
+                            fig, ax = plt.subplots()
+                            ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, ValidationFunc.PFP_ALT_plotting_vars[i_var])
+                            SegmentAltVar(target_mask, pfp_branches, ValidationFunc.PFP_ALT_plotting_vars[i_var], seg_var, ax)
+                            file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
+                            plt.close(fig)
+                            fig.savefig(f'{plot_dir_path}/ALT/{ValidationFunc.PFP_ALT_plotting_vars[i_var].tree_name}/Seg/{file_name}_{seg_var.label}.pdf', bbox_inches='tight')
+                        
                     # Plot efficiency
                     for i_var in range(len(ValidationFunc.PFP_efficiency_vars)) :
                         fig, ax = plt.subplots()
@@ -121,6 +137,17 @@ def TrackShowerClassification(reco_mask, pdg_masks, pfp_branches, fig, ax, int_t
                     ha="center", va="center", color=("white" if conf_matrix_eff[i, j] > 0.5 else "black"))
     
     plt.tight_layout()
+
+#####################################################################################################################################################
+####################################################################################################################################################
+
+def SegmentAltVar(target_mask, pfp_branches, plot_var, seg_var, ax):
+
+    n_entries = ak.count_nonzero(target_mask)
+    
+    for index in range(len(seg_var.options)) :
+        mask = target_mask & (pfp_branches[seg_var.tree_name] == seg_var.options[index])
+        ValidationFunc.PlotVariable(mask, pfp_branches, plot_var, ax, f'{seg_var.options[index]}', seg_var.colors[index], fill=False, n_entries=n_entries)
 
 #####################################################################################################################################################
 #####################################################################################################################################################

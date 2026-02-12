@@ -2,7 +2,58 @@ import awkward as ak
 import numpy as np
 import matplotlib.pyplot as plt
 import Definitions
-        
+import ValidationFunc
+
+##############################################################################################
+##############################################################################################
+
+def CreateGraphs(plot_dir_path, int_masks, event_branches) :
+
+    for int_type in Definitions.ints :
+        int_mask = int_masks[int_type]
+    
+        target_mask = int_mask
+        reco_mask = target_mask & (event_branches['RecoNu_VertexZ'] > -9000)
+    
+        # Plot MCP_var distributions
+        for plot_var in ValidationFunc.Event_MCP_plotting_vars :
+            fig, ax = plt.subplots()
+            ValidationFunc.ConfigurePlot(fig, ax, int_type, -1, 0, plot_var)                
+            ValidationFunc.PlotVariable(target_mask, event_branches, plot_var, ax, Definitions.int_strings[int_type], Definitions.int_color[int_type])
+            plt.close(fig)
+            file_name = f'{Definitions.int_file_strings[int_type]}'
+            fig.savefig(f'{plot_dir_path}/MCP/{plot_var.tree_name}/{file_name}.pdf', bbox_inches='tight')          
+    
+        # Plot BM_var distributions
+        for plot_var in ValidationFunc.Event_Reco_plotting_vars :
+            fig, ax = plt.subplots()
+            ValidationFunc.ConfigurePlot(fig, ax, int_type, -1, 0, plot_var)    
+            ValidationFunc.PlotVariable(reco_mask, event_branches, plot_var, ax, Definitions.int_strings[int_type], Definitions.int_color[int_type])
+            plt.close(fig) 
+            file_name = f'{Definitions.int_file_strings[int_type]}'
+            fig.savefig(f'{plot_dir_path}/Reco/{plot_var.tree_name}/{file_name}.pdf', bbox_inches='tight')           
+    
+        # Plot diff_vars
+        for plot_var in ValidationFunc.Event_diff_plotting_vars :
+            fig, ax = plt.subplots()
+            ValidationFunc.ConfigurePlot(fig, ax, int_type, -1, 0, plot_var)  
+            ValidationFunc.PlotDiffVariable(reco_mask, event_branches, plot_var, ax, Definitions.int_strings[int_type], Definitions.int_color[int_type])
+            plt.close(fig)
+            file_name = f'{Definitions.int_file_strings[int_type]}'
+            fig.savefig(f'{plot_dir_path}/Diff/{plot_var.true_tree_name}_{plot_var.reco_tree_name}/{file_name}.pdf', bbox_inches='tight')             
+    
+        # Plot vertex dR plots
+        fig, ax = plt.subplots()
+        PlotVertexCumulativeDR(event_branches, target_mask, True,  Definitions.int_strings[int_type], Definitions.int_color[int_type], ax, fig)
+        plt.close(fig)
+        fig.savefig(f'{plot_dir_path}/Reco/{Definitions.int_file_strings[int_type]}_CumulativeDR_All.pdf', bbox_inches='tight')  
+    
+        fig, ax = plt.subplots()
+        PlotVertexCumulativeDR(event_branches, reco_mask, False,  Definitions.int_strings[int_type], Definitions.int_color[int_type], ax, fig)
+        plt.close(fig)
+        fig.savefig(f'{plot_dir_path}/Reco/{Definitions.int_file_strings[int_type]}_CumulativeDR_OnlyReco.pdf', bbox_inches='tight') 
+
+
 ##############################################################################################
 ##############################################################################################
 
