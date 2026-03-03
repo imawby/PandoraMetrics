@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import Definitions
 import ValidationFunc
+import Variables
 
 #####################################################################################################################################################
 ####################################################################################################################################################
@@ -17,35 +18,32 @@ def CreateGraphs(plot_dir_path, config_target_mask, config_reco_mask, tier_masks
     
             for i_pdg in range(len(Definitions.pdgs)) :
                 pdg = Definitions.pdgs[i_pdg]
+                file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
+                
                 pdg_mask = pdg_masks[pdg]
-    
                 target_mask = config_target_mask & tier_mask & int_mask & pdg_mask
                 reco_mask = target_mask & config_reco_mask
     
                 # Plot MCP_var distributions
-                for plot_var in ValidationFunc.Shower_MCP_plotting_vars :
+                for plot_var in Variables.Shower_MCP_plotting_vars :
                     fig, ax = plt.subplots()
-                    ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, plot_var)                
+                    ValidationFunc.ConfigurePlot(fig, ax, plot_var, int_string=Definitions.int_file_strings[int_type],  tier_string=Definitions.tier_strings[tier], pdg_string=Definitions.pdg_strings[pdg])            
                     ValidationFunc.PlotVariable(target_mask, shower_branches, plot_var, ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
-                    plt.close(fig)
-                    file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
+                    plt.close(fig)                    
                     fig.savefig(f'{plot_dir_path}/MCP/{plot_var.tree_name}/{file_name}.pdf', bbox_inches='tight')                 
     
                 # Plot BM_var distributions
-                for plot_var in ValidationFunc.Shower_BM_plotting_vars :
+                for plot_var in Variables.Shower_BM_plotting_vars :
                     fig, ax = plt.subplots()
-                    ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, plot_var)
+                    ValidationFunc.ConfigurePlot(fig, ax, plot_var, int_string=Definitions.int_file_strings[int_type],  tier_string=Definitions.tier_strings[tier], pdg_string=Definitions.pdg_strings[pdg])
                     ValidationFunc.PlotVariable(reco_mask, shower_branches, plot_var, ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
                     plt.close(fig)
-                    file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
                     fig.savefig(f'{plot_dir_path}/BM/{plot_var.tree_name}/{file_name}.pdf', bbox_inches='tight')                     
     
                 # Plot diff_vars
-                for plot_var in ValidationFunc.Shower_diff_plotting_vars :
+                for plot_var in Variables.Shower_diff_plotting_vars :
                     fig, ax = plt.subplots()
-                    ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, plot_var)
+                    ValidationFunc.ConfigurePlot(fig, ax, plot_var, int_string=Definitions.int_file_strings[int_type],  tier_string=Definitions.tier_strings[tier], pdg_string=Definitions.pdg_strings[pdg])
                     ValidationFunc.PlotDiffVariable(reco_mask, shower_branches, plot_var, ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
                     plt.close(fig)
                     fig.savefig(f'{plot_dir_path}/Diff/{plot_var.true_tree_name}_{plot_var.reco_tree_name}/{file_name}.pdf', bbox_inches='tight')         
-
-

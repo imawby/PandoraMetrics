@@ -2,9 +2,8 @@ import awkward as ak
 import numpy as np
 import matplotlib.pyplot as plt
 import Definitions
+import Variables
 import ValidationFunc
-
-
 
 #####################################################################################################################################################
 ####################################################################################################################################################
@@ -32,6 +31,7 @@ def CreateGraphs(plot_dir_path, config_target_mask, config_reco_mask, tier_masks
         
                 for i_pdg in range(len(Definitions.pdgs)) :
                     pdg = Definitions.pdgs[i_pdg]
+                    file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
                     pdg_mask = pdg_masks[pdg]
                     target_mask = tier_mask & int_mask & pdg_mask & config_target_mask
                     reco_mask = target_mask & config_reco_mask               
@@ -41,67 +41,68 @@ def CreateGraphs(plot_dir_path, config_target_mask, config_reco_mask, tier_masks
                     ValidationFunc.PrintEfficiencyTableEntry(tier, pdg, efficiency_metrics, f_efficiency)
                     
                     # Track-shower plots
-                    for i_var in range(len(ValidationFunc.PFP_track_shower_plotting_vars)) :
+                    for plot_var in Variables.PFP_track_shower_plotting_vars :
                         fig, ax = plt.subplots()
-                        ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, ValidationFunc.PFP_track_shower_plotting_vars[i_var])
-                        ValidationFunc.TrackShowerAsAFunctionOf(reco_mask, pfp_branches, ValidationFunc.PFP_track_shower_plotting_vars[i_var], fig, ax, Definitions.pdg_strings[pdg])
-                        plt.close(fig)
-                        file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
-                        fig.savefig(f'{plot_dir_path}/TrackShower/{ValidationFunc.PFP_track_shower_plotting_vars[i_var].tree_name}/{file_name}.pdf', bbox_inches='tight')                    
+                        ValidationFunc.ConfigurePlot(fig, ax, plot_var, Definitions.int_strings[int_type], Definitions.tier_strings[tier], Definitions.pdg_strings[pdg])
+                        ValidationFunc.TrackShowerAsAFunctionOf(reco_mask, pfp_branches, plot_var, fig, ax, Definitions.pdg_strings[pdg])
+                        plt.close(fig)                        
+                        fig.savefig(f'{plot_dir_path}/TrackShower/{plot_var.tree_name}/{file_name}.pdf', bbox_inches='tight')                    
         
                     # Plot MCP_var distributions
-                    for i_var in range(len(ValidationFunc.PFP_MCP_plotting_vars)) :
+                    for plot_var in Variables.PFP_MCP_plotting_vars :
                         fig, ax = plt.subplots()
-                        ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, ValidationFunc.PFP_MCP_plotting_vars[i_var])
-                        ValidationFunc.PlotVariable(target_mask, pfp_branches, ValidationFunc.PFP_MCP_plotting_vars[i_var], ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
+                        ValidationFunc.ConfigurePlot(fig, ax, plot_var, Definitions.int_strings[int_type], Definitions.tier_strings[tier], Definitions.pdg_strings[pdg])
+                        ValidationFunc.PlotVariable(target_mask, pfp_branches, plot_var, ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
                         plt.close(fig)
-                        file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
-                        fig.savefig(f'{plot_dir_path}/MCP/{ValidationFunc.PFP_MCP_plotting_vars[i_var].tree_name}/{file_name}.pdf', bbox_inches='tight')                        
+                        fig.savefig(f'{plot_dir_path}/MCP/{plot_var.tree_name}/{file_name}.pdf', bbox_inches='tight')                        
         
                     # Plot BM_var distributions
-                    for i_var in range(len(ValidationFunc.PFP_BM_plotting_vars)) :
+                    for plot_var in Variables.PFP_BM_plotting_vars :
                         fig, ax = plt.subplots()                    
-                        ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, ValidationFunc.PFP_BM_plotting_vars[i_var])
-                        ValidationFunc.PlotVariable(reco_mask, pfp_branches, ValidationFunc.PFP_BM_plotting_vars[i_var], ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
+                        ValidationFunc.ConfigurePlot(fig, ax, plot_var, Definitions.int_strings[int_type], Definitions.tier_strings[tier], Definitions.pdg_strings[pdg])
+                        ValidationFunc.PlotVariable(reco_mask, pfp_branches, plot_var, ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
                         plt.close(fig)
-                        file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
-                        fig.savefig(f'{plot_dir_path}/BM/{ValidationFunc.PFP_BM_plotting_vars[i_var].tree_name}/{file_name}.pdf', bbox_inches='tight')                             
+                        fig.savefig(f'{plot_dir_path}/BM/{plot_var.tree_name}/{file_name}.pdf', bbox_inches='tight')   
+                        
                     # Plot ALT_var distributions                        
-                    for i_var in range(len(ValidationFunc.PFP_ALT_plotting_vars)) :
+                    for plot_var in Variables.PFP_ALT_plotting_vars :
                         fig, ax = plt.subplots()
-                        ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, ValidationFunc.PFP_ALT_plotting_vars[i_var])
-                        ValidationFunc.PlotVariable(target_mask, pfp_branches, ValidationFunc.PFP_ALT_plotting_vars[i_var], ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
+                        ValidationFunc.ConfigurePlot(fig, ax, plot_var, Definitions.int_strings[int_type], Definitions.tier_strings[tier], Definitions.pdg_strings[pdg])
+                        ValidationFunc.PlotVariable(target_mask, pfp_branches, plot_var, ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
                         plt.close(fig)
-                        file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
-                        fig.savefig(f'{plot_dir_path}/ALT/{ValidationFunc.PFP_ALT_plotting_vars[i_var].tree_name}/{file_name}.pdf', bbox_inches='tight')  
+                        fig.savefig(f'{plot_dir_path}/ALT/{plot_var.tree_name}/{file_name}.pdf', bbox_inches='tight')  
                         # Now segment
-                        for seg_var in ValidationFunc.ALT_seg_vars :
+                        for seg_var in Variables.ALT_seg_vars :
                             fig, ax = plt.subplots()
-                            ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, ValidationFunc.PFP_ALT_plotting_vars[i_var])
-                            SegmentAltVar(target_mask, pfp_branches, ValidationFunc.PFP_ALT_plotting_vars[i_var], seg_var, ax)
-                            file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
+                            ValidationFunc.ConfigurePlot(fig, ax, plot_var, Definitions.int_strings[int_type], Definitions.tier_strings[tier], Definitions.pdg_strings[pdg])
+                            SegmentAltVar(target_mask, pfp_branches, plot_var, seg_var, ax)
                             plt.close(fig)
-                            fig.savefig(f'{plot_dir_path}/ALT/{ValidationFunc.PFP_ALT_plotting_vars[i_var].tree_name}/Seg/{file_name}_{seg_var.label}.pdf', bbox_inches='tight')
+                            fig.savefig(f'{plot_dir_path}/ALT/{plot_var.tree_name}/Seg/{file_name}_{seg_var.label}.pdf', bbox_inches='tight')
                         
                     # Plot efficiency
-                    for i_var in range(len(ValidationFunc.PFP_efficiency_vars)) :
+                    for plot_var in Variables.PFP_efficiency_vars :
                         fig, ax = plt.subplots()
-                        ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, ValidationFunc.PFP_efficiency_vars[i_var])
-                        ValidationFunc.PlotEfficiency(target_mask, reco_mask, pfp_branches, ValidationFunc.PFP_efficiency_vars[i_var], fig, ax, Definitions.pdg_color[pdg], Definitions.pdg_strings[pdg])   
+                        ValidationFunc.ConfigurePlot(fig, ax, plot_var, Definitions.int_strings[int_type], Definitions.tier_strings[tier], Definitions.pdg_strings[pdg])
+                        ValidationFunc.PlotEfficiency(target_mask, reco_mask, pfp_branches, plot_var, fig, ax, Definitions.pdg_color[pdg], Definitions.pdg_strings[pdg])   
                         plt.close(fig)
-                        file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
-                        fig.savefig(f'{plot_dir_path}/Efficiency/{ValidationFunc.PFP_efficiency_vars[i_var].tree_name}/{file_name}.pdf', bbox_inches='tight')                        
+                        fig.savefig(f'{plot_dir_path}/Efficiency/{plot_var.tree_name}/{file_name}.pdf', bbox_inches='tight')                        
         
                     # Plot diff_vars
-                    for i_var in range(len(ValidationFunc.PFP_diff_plotting_vars)) :
+                    for plot_var in Variables.PFP_diff_plotting_vars :
                         fig, ax = plt.subplots()
-                        ValidationFunc.ConfigurePlot(fig, ax, int_type, tier, pdg, ValidationFunc.PFP_diff_plotting_vars[i_var])
-                        ValidationFunc.PlotDiffVariable(reco_mask, pfp_branches, ValidationFunc.PFP_diff_plotting_vars[i_var], ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
+                        ValidationFunc.ConfigurePlot(fig, ax, plot_var, Definitions.int_strings[int_type], Definitions.tier_strings[tier], Definitions.pdg_strings[pdg])
+                        ValidationFunc.PlotDiffVariable(reco_mask, pfp_branches, plot_var, ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
                         plt.close(fig)
-                        file_name = f'{Definitions.int_file_strings[int_type]}_{Definitions.tier_strings[tier]}_{Definitions.pdg_strings[pdg]}'
-                        fig.savefig(f'{plot_dir_path}/Diff/{ValidationFunc.PFP_diff_plotting_vars[i_var].true_tree_name}_{ValidationFunc.PFP_diff_plotting_vars[i_var].reco_tree_name}/{file_name}.pdf', bbox_inches='tight')                          
-                    
-    
+                        fig.savefig(f'{plot_dir_path}/Diff/{plot_var.true_tree_name}_{plot_var.reco_tree_name}/{file_name}.pdf', bbox_inches='tight')
+
+                    # Plot Profiles
+                    for profile_var in Variables.PFP_profile_vars :
+                        fig, ax = plt.subplots()
+                        ValidationFunc.ConfigurePlot(fig, ax, profile_var.plot_var_x, Definitions.int_strings[int_type], Definitions.tier_strings[tier], Definitions.pdg_strings[pdg])
+                        ValidationFunc.PlotProfileX(target_mask, pfp_branches, profile_var, ax, Definitions.pdg_strings[pdg], Definitions.pdg_color[pdg])
+                        plt.close(fig)
+                        fig.savefig(f'{plot_dir_path}/XProfile/{profile_var.plot_var_y.tree_name}_{profile_var.plot_var_x.tree_name}/{file_name}.pdf', bbox_inches='tight')
+                        
                 ValidationFunc.PrintEfficiencyTableFooter(f_efficiency)
 
 #####################################################################################################################################################

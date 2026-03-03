@@ -3,12 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import Definitions
 
-plot_dir = '/Users/isobel/Desktop/DUNE/2026/PandoraValidation/HierarchyValPlots/'
-
 ##############################################################################################
 ##############################################################################################
 
-def CreateHierarchyTableMetrics(int_masks, tier_masks, pfp_target_mask, pfp_reco_mask, pdg_masks, hierarchy_branches, pfp_branches, demand_parent_has_match, split_by_pdg) :
+def CreateHierarchyTableMetrics(plot_dir_path, int_masks, tier_masks, pfp_target_mask, pfp_reco_mask, pdg_masks, hierarchy_branches, pfp_branches, demand_parent_has_match, split_by_pdg) :
 
     # Cache awkward arrays locally
     mc_tier      = hierarchy_branches['MC_HierarchyTier']
@@ -21,7 +19,7 @@ def CreateHierarchyTableMetrics(int_masks, tier_masks, pfp_target_mask, pfp_reco
     
         file_name = f'HierarchyMetricTables_{Definitions.int_file_strings[int_type]}' + ('_PDG' if split_by_pdg else '') + ('_YesDemandParentRecod' if demand_parent_has_match else '_NotDemandParentRecod')
         
-        with open(f'{plot_dir}{file_name}.txt', "w") as f:
+        with open(f'{plot_dir_path}{file_name}.txt', "w") as f:
         
             print("DEMAND_PARENT_HAS_MATCH =", demand_parent_has_match, file=f)
             print("SPLIT_BY_PDG =", split_by_pdg, file=f)
@@ -41,14 +39,14 @@ def CreateHierarchyTableMetrics(int_masks, tier_masks, pfp_target_mask, pfp_reco
                 print('------------------------------------------------------------------------------------', file=f)    
             
                 for tier in Definitions.tiers :
-                    target_mask = (mc_has_match == 1) & tier_masks[tier] & int_masks[int_type] & pdg_mask
+                    target_mask = mc_has_match & tier_masks[tier] & int_masks[int_type] & pdg_mask
                     primary_reco_mask = target_mask & (bm_tier == 1)
                     other_reco_mask = target_mask & (bm_tier != 1)
                 
                     # If we're looking at the correctness of parent-child links,
                     # do we want to demand that the parent is reconstructed?
                     if ((tier != 0) & demand_parent_has_match) :
-                        other_reco_mask = other_reco_mask & (mc_has_match[mc_parent] == 1)
+                        other_reco_mask = other_reco_mask & mc_has_match[mc_parent]
                         
                     n_other = ak.sum(other_reco_mask) + ak.sum(primary_reco_mask)
                 

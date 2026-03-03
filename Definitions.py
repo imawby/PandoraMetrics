@@ -4,12 +4,12 @@ import awkward as ak
 ##############################################################################################
 
 # Is target
-MIN_VIEW_HITS = 10         # Tree filled by MIN_VIEW_HITS=10
+MIN_VIEW_HITS = 5         # Tree filled by MIN_VIEW_HITS=10
 MIN_VIEWS = 2              # Tree filled by MIN_VIEWS=2
-MIN_TOTAL_HITS = 30        # Tree filled by MIN_TOTAL_HITS=10
+MIN_TOTAL_HITS = 15        # Tree filled by MIN_TOTAL_HITS=10
 
 # Is reconstructed
-MIN_COMPLETENESS = 0.1     # Tree filled by MIN_COMPLETENESS=0.1
+MIN_COMPLETENESS = 0.8     # Tree filled by MIN_COMPLETENESS=0.1
 MIN_PURITY = 0.5           # Tree filled by MIN_PURITY=0.5
  
 ##############################################################################################
@@ -98,10 +98,18 @@ tier_style = {
 #####
 
 michel_types = [0, 1, 2]
-
 michel_type_strings = {
     0 : "FromMuon",
     1 : "FromPion",
+    2 : "All"
+}
+
+#####
+
+track_shower_types = [0, 1, 2] # 0==MCShower, 1==MCTrack, 2==All
+track_shower_strings = {
+    0 : "Shower",
+    1 : "Track",
     2 : "All"
 }
 
@@ -209,6 +217,21 @@ def GetTierMasks(hierarchy_branches) :
     }
 
     return tier_masks    
+
+##############################################################################################
+##############################################################################################
+
+def GetTrackShowerMasks(pfp_branches) :
+
+    mc_track_shower = pfp_branches['MCP_IsTrack']
+    
+    track_shower_masks = {
+        0  : (mc_track_shower == 0),
+        1  : (mc_track_shower == 1),
+        2  : (ak.ones_like(mc_track_shower,  dtype=bool))
+    }
+
+    return track_shower_masks       
     
 
 ##############################################################################################
