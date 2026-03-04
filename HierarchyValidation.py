@@ -251,8 +251,8 @@ HierarchyValidationFunc.CreateHierarchyTableMetrics(plot_dir, int_masks, tier_ma
 # # cumulative match = parent_cumulative AND this particle
 # cumulative.append(correct[i] * parent_cumulative)
 
-print(jam)
-print(ak.flatten(jam, axis=2))
+# print(jam)
+# print(ak.flatten(jam, axis=2))
 
 
 # In[ ]:
