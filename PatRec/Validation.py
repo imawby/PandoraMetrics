@@ -8,6 +8,7 @@ import Definitions
 import Variables
 #import ValidationFunc
 import EventValidationFunc
+import HierarchyValidationFunc
 
 import os
 
@@ -41,13 +42,14 @@ def main(args) :
 
     track_branches = track_tree.arrays(['BM_EndpointAcc'], library="ak")
 
-    hierarchy_branches = hierarchy_tree.arrays(['MC_HierarchyTier'], library="ak")
+    hierarchy_branches = hierarchy_tree.arrays(['MC_HierarchyTier', 'MC_ParentIndex', 'BM_HierarchyTier', 'BM_ParentIndex'], library="ak")
 
     ###################################
     # Create interaction/tier/PDG masks
     ###################################
     int_masks = Definitions.GetIntMasks(event_branches, pfp_branches={}, broadcast=False)
     int_masks_broadcast = Definitions.GetIntMasks(event_branches, pfp_branches)
+    pdg_masks = Definitions.GetPDGMasks(pfp_branches)
     tier_masks = Definitions.GetTierMasks(hierarchy_branches)
 
     ##########################################################################################################
@@ -60,45 +62,46 @@ def main(args) :
 
     # Event Validation Plots
     event_plot_dir = f'{args.plot_dir}/EventValidation/'
-    EventValidationFunc.create_graphs(event_plot_dir, int_masks, event_branches)
+    EventValidationFunc.run_event_validation(event_plot_dir, int_masks, event_branches)
 
+    # Hierarchy Validation Plots
+    hierarchy_plot_dir = f'{args.plot_dir}/HierarchyValidation/'
+    HierarchyValidationFunc.run_hierarchy_validation(hierarchy_plot_dir, pfp_target_mask, pfp_reco_mask, int_masks_broadcast, tier_masks, pdg_masks, hierarchy_branches, pfp_branches)
+    
 ##########################################################################################################
 ##########################################################################################################
     
 def create_directory_structure(plot_dir) :
-    # Make directory structure for plots
     if not os.path.isdir(plot_dir) :
         os.makedirs(plot_dir)
 
-    # EventTree plots
-    event_plot_dir = f'{plot_dir}/EventValidation/'
-    if not os.path.isdir(f'{event_plot_dir}') :
-        os.makedirs(f'{event_plot_dir}')
+    # EventTree
+    create_tree_directory(plot_dir, 'EventValidation')
+    create_subdirectory(f'{plot_dir}/EventValidation', 'MC', Variables.Event_MCP_plotting_vars)
+    create_subdirectory(f'{plot_dir}/EventValidation', 'Reco', Variables.Event_Reco_plotting_vars)
+    create_subdirectory(f'{plot_dir}/EventValidation', 'Diff', Variables.Event_diff_plotting_vars + [Variables.vtx_dr_all, Variables.vtx_dr_only_reco])
 
-    #  MCP_var distributions
-    if not os.path.isdir(f'{event_plot_dir}/MC/') :
-        os.makedirs(f'{event_plot_dir}/MC/')
-    for plot_var in Variables.Event_MCP_plotting_vars :
-        if not os.path.isdir(f'{event_plot_dir}/MC/{plot_var.dir_name}') :
-            os.makedirs(f'{event_plot_dir}/MC/{plot_var.dir_name}')
+    # HierarchyTree
+    create_tree_directory(plot_dir, 'HierarchyValidation')
 
-    #  Reco distributions
-    if not os.path.isdir(f'{event_plot_dir}/Reco/') :
-        os.makedirs(f'{event_plot_dir}/Reco/')
-    for plot_var in Variables.Event_Reco_plotting_vars :
-        if not os.path.isdir(f'{event_plot_dir}/Reco/{plot_var.dir_name}') :
-            os.makedirs(f'{event_plot_dir}/Reco/{plot_var.dir_name}')
+
+##########################################################################################################
+##########################################################################################################
+    
+def create_tree_directory(root_dir, tree_name) :
+    if not os.path.isdir(f'{root_dir}/{tree_name}') :
+        os.makedirs(f'{root_dir}/{tree_name}')
+    
+##########################################################################################################
+##########################################################################################################
+    
+def create_subdirectory(root_dir, sub_dir, plot_vars) :
+    if not os.path.isdir(f'{root_dir}/{sub_dir}') :
+        os.makedirs(f'{root_dir}/{sub_dir}/')
+    for plot_var in plot_vars :
+        if not os.path.isdir(f'{root_dir}/{sub_dir}/{plot_var.dir_name}') :
+            os.makedirs(f'{root_dir}/{sub_dir}/{plot_var.dir_name}')
             
-    #  Diff distributions
-    if not os.path.isdir(f'{event_plot_dir}/Diff/') :
-        os.makedirs(f'{event_plot_dir}/Diff/')
-    for plot_var in Variables.Event_diff_plotting_vars :
-        if not os.path.isdir(f'{event_plot_dir}/Diff/{plot_var.dir_name}') :
-            os.makedirs(f'{event_plot_dir}/Diff/{plot_var.dir_name}')
-    for plot_var in [Variables.vtx_dr_all, Variables.vtx_dr_only_reco] :
-        if not os.path.isdir(f'{event_plot_dir}/Diff/{plot_var.dir_name}') :
-            os.makedirs(f'{event_plot_dir}/Diff/{plot_var.dir_name}')            
-
 ##########################################################################################################
 ##########################################################################################################
             

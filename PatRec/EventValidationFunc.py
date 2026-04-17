@@ -39,7 +39,7 @@ def plot_cumulative_dr(indices_or_mask, event_branches, plot_var, ax, string, co
 ##############################################################################################
 ##############################################################################################
 
-def create_graphs(plot_dir_path, int_masks, event_branches) :
+def run_event_validation(plot_dir_path, int_masks, event_branches) :
 
     for int_type in Definitions.ints :
         # Get masks
