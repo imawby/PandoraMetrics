@@ -65,34 +65,32 @@ Event_Reco_plotting_vars = [nu_vertex_accuracy]
 # PFP_track_shower_plotting_vars = [n_mc_hits_2d_var, theta_xz_var, theta_yz_var]
 # PFP_efficiency_vars = [n_mc_hits_2d_var, theta_xz_var, theta_yz_var, true_vis_energy, multiplicity_var, shower_multiplicity_var, mc_displacement_var]
 
-# # Michel
-# michel_true_vis_energy = PlotVar('MCP_TrueVisEnergy', 'True Visible Energy', 'Frac. of Michels', [0,0.1], 20)
-# michel_n_mc_hits_2d_var = PlotVar('MCP_NMCHits2D', 'Michel NMCHits2D', 'Frac. of Michels', [Definitions.MIN_TOTAL_HITS, 150], 15)
-# michel_completeness_var = PlotVar('BM_Completeness', 'Completeness', 'Frac. of Michels', [0,1.0], 20)
-# michel_purity_var = PlotVar('BM_Purity', 'Purity', 'Frac. of Michels', [0,1.0], 20)
-# Michel_MCP_plotting_vars = [michel_n_mc_hits_2d_var, michel_completeness_var, michel_purity_var, michel_true_vis_energy]
-# Michel_track_shower_vars = [michel_n_mc_hits_2d_var]
-# Michel_efficiency_vars = [michel_n_mc_hits_2d_var, michel_true_vis_energy]
+# Michel
+michel_true_vis_energy = PlotVar('TrueVisEnergy', 'MCP_TrueVisEnergy', 'True Visible Energy', 'Frac. of Michels', [0,0.1], 20)
+michel_n_mc_hits_2d = PlotVar('NMCHits2D', 'MCP_NMCHits2D', 'Michel NMCHits2D', 'Frac. of Michels', [Definitions.MIN_TOTAL_HITS, 150], 15)
+michel_completeness = PlotVar('Completeness', 'BM_Completeness', 'Completeness', 'Frac. of Michels', [0,1.0], 20)
+michel_purity = PlotVar('Purity', 'BM_Purity', 'Purity', 'Frac. of Michels', [0,1.0], 20)
+Michel_MCP_plotting_vars = [michel_n_mc_hits_2d, michel_completeness, michel_purity, michel_true_vis_energy]
+Michel_track_shower_vars = [michel_n_mc_hits_2d]
+Michel_efficiency_vars = [michel_n_mc_hits_2d, michel_true_vis_energy]
 
 # Track
-# track_n_endpoint_mc_hits_var = PlotVar('MCP_EndpointsMCHits', 'NEndpointsMCHits', 'Frac. of PFParticles', [0,50], 20)
-# track_endpoint_completeness_var = PlotVar('BM_EndpointCompleteness', 'Endpoint Completeness', 'Frac. of PFParticles', [-1.5,1.0], 50)
-# track_endpoint_purity_var = PlotVar('BM_EndpointPurity', 'EndpointPurity', 'Frac. of PFParticles', [-1.5,1.0], 50)
-# track_signed_endpoint_acc_var = PlotVar('BM_EndpointAcc', 'Signed Endpoint deltaR [cm]', 'Frac. of PFParticles', [-25,25], 25)
-# Track_MCP_plotting_vars = [track_endpoint_completeness_var, track_endpoint_purity_var, track_n_endpoint_mc_hits_var]
-# Track_BM_plotting_vars = [track_signed_endpoint_acc_var]
+track_endpoint_n_mc_hits = PlotVar('EndpointNMCHits', 'MCP_EndpointsMCHits', 'Endpoint nMCHits', 'Frac. of PFParticles', [0,50], 20)
+track_endpoint_completeness = PlotVar('EndpointCompleteness', 'BM_EndpointCompleteness', 'Endpoint Completeness', 'Frac. of PFParticles', [-1.5,1.0], 50)
+track_endpoint_purity = PlotVar('EndpointPurity', 'BM_EndpointPurity', 'EndpointPurity', 'Frac. of PFParticles', [-1.5,1.0], 50)
+track_signed_endpoint_acc = PlotVar('EndpointAcc', 'BM_EndpointAcc', 'Signed Endpoint deltaR [cm]', 'Frac. of PFParticles', [-25,25], 25)
+Track_MCP_plotting_vars = [track_endpoint_completeness, track_endpoint_purity, track_endpoint_n_mc_hits]
+Track_BM_plotting_vars = [track_signed_endpoint_acc]
 
-# # Shower
-# shower_initial_MC_hits = PlotVar('MCP_InitialMCHits', 'Initial NMCHits2D', 'Frac. of True Showers', [0,150], 30)
-# shower_initial_PFP_hits = PlotVar('BM_InitialPfoHits', 'Initial n Pfo Hits2D', 'Frac. of True Showers', [0,150], 30)
-# # -1 == no MC hits in initial region
-# shower_initial_completeness = PlotVar('BM_InitialCompleteness', 'Initial Completeness', 'Frac. of True Showers', [-1.05,1.0], 20)
-# # -1 == no MC hits in initial region
-# shower_initial_purity = PlotVar('BM_InitialPurity', 'Initial Purity', 'Frac. of True Showers', [-1.05,1.0], 20)                   
-# shower_dir_acc = PlotVar('BM_DirAcc', 'True-Reco Dir Opening Angle [radians]', 'Frac. of Reco Showers', [-1.1, 3.2], 50)  
-# shower_moliere = PlotVar('BM_MoliereRadius', 'Moliere Radius', 'Frac. of Reco Showers', [-1.0, 20], 22)  
-# Shower_MCP_plotting_vars = [shower_initial_MC_hits, shower_initial_PFP_hits, shower_initial_completeness, shower_initial_purity]
-# Shower_BM_plotting_vars = [shower_dir_acc, shower_moliere]
+# Shower
+shower_initial_MC_hits = PlotVar('InitialMCHits2D', 'MCP_InitialMCHits', 'Initial # MC 2D Hits', 'Frac. of True Showers', [0,150], 30)
+shower_initial_PFP_hits = PlotVar('InitialPfoHits2D', 'BM_InitialPfoHits', 'Initial # Pfo 2D Hits', 'Frac. of True Showers', [0,150], 30) # -1 == no MC hits in initial region
+shower_initial_completeness = PlotVar('InitialCompleteness', 'BM_InitialCompleteness', 'Initial Completeness', 'Frac. of True Showers', [-1.05,1.0], 20) # -1 == no MC hits in initial region
+shower_initial_purity = PlotVar('InitialPurity', 'BM_InitialPurity', 'Initial Purity', 'Frac. of True Showers', [-1.05,1.0], 20)                   
+shower_dir_acc = PlotVar('InitialDirAccuracy', 'BM_DirAcc', 'True-Reco Dir Opening Angle [radians]', 'Frac. of Reco Showers', [-1.1, 3.2], 50)  
+shower_moliere = PlotVar('MoliereRadius', 'BM_MoliereRadius', 'Moliere Radius', 'Frac. of Reco Showers', [-1.0, 20], 22)  
+Shower_MCP_plotting_vars = [shower_initial_MC_hits, shower_initial_PFP_hits, shower_initial_completeness, shower_initial_purity]
+Shower_BM_plotting_vars = [shower_dir_acc, shower_moliere]
 
 ###############################################
 # PlotDiffVar
@@ -103,9 +101,9 @@ Event_Reco_plotting_vars = [nu_vertex_accuracy]
 # displacement_diff_var = PlotDiffVar('MCP_Displacement', 'BM_Displacement', 'True-Reco Displacement', 'Frac. of PFParticles', [-20, 20], 20)
 # PFP_diff_plotting_vars = [length_diff_var, displacement_diff_var]
 
-# # Shower
-# core_length_diff = PlotDiffVar('MCP_TrueCoreLengthFromW', 'BM_RecoCoreLength', 'True-Reco Core Length (from W) [cm]', 'Frac. of Reco Showers', [-50, 50], 50)
-# Shower_diff_plotting_vars = [core_length_diff]
+# Shower
+core_length_diff = PlotDiffVar('DeltaCoreLengthFromW', 'MCP_TrueCoreLengthFromW', 'BM_RecoCoreLength', 'True-Reco Core Length (from W) [cm]', 'Frac. of Reco Showers', [-50, 50], 50)
+Shower_diff_plotting_vars = [core_length_diff]
 
 # Event
 nu_vtx_delta_x = PlotDiffVar('VertexDeltaX', 'MCNu_VertexX', 'RecoNu_VertexX', 'TrueX-RecoX [cm]', 'Frac. of Reco Nu', [-10,10.0], 100)

@@ -6,8 +6,19 @@ import Definitions
 
 ##############################################################################################
 ##############################################################################################
+    
+class PlotConfig :
+    def __init__(self, file_name, int_string, tier_string, pdg_string, color) :
+        self.file_name = file_name
+        self.int_string = int_string
+        self.tier_string = tier_string        
+        self.pdg_string = pdg_string
+        self.color = color
 
-def ConfigurePlot(fig, ax, plot_var, int_string="", tier_string="", pdg_string="") :
+##############################################################################################
+##############################################################################################
+
+def configure_plot(fig, ax, plot_var, int_string="", tier_string="", pdg_string="") :
 
     title = '       '
     if (int_string) :
@@ -23,11 +34,33 @@ def ConfigurePlot(fig, ax, plot_var, int_string="", tier_string="", pdg_string="
     ax.tick_params(labelbottom=True, bottom=True, labelleft=True, left=True)
     fig.subplots_adjust(left=0.08, right=0.98, bottom=0.10, top=0.95, hspace=0.4, wspace=0.4)
 
+##############################################################################################
+##############################################################################################
+
+def save_plot(fig, path) :
+    plt.close(fig)      
+    fig.savefig(path, bbox_inches='tight')
+
+##############################################################################################
+##############################################################################################    
+
+
+def create_plots(masks, branches, plot_func, plot_vars, sub_dir, plot_config) :
+    for plot_var in plot_vars :
+        fig, ax = plt.subplots()
+        configure_plot(fig, ax, plot_var, int_string=plot_config.int_string, pdg_string=plot_config.pdg_string)
+        
+        if len(masks) == 1 :
+            plot_func(next(iter(masks.values())), branches, plot_var, ax, plot_config.pdg_string, plot_config.color)
+        else :
+            plot_func(masks['target'], masks['reco'], branches, plot_var, ax, plot_config.pdg_string, plot_config.color)
+            
+        save_plot(fig, f'{sub_dir}/{plot_var.dir_name}/{plot_config.file_name}.pdf')      
 
 ##############################################################################################
 ##############################################################################################
 
-def TrackShowerAsAFunctionOf(pfp_indices, pfp_branches, plot_var, fig, ax, legend_string) :
+def TrackShowerAsAFunctionOf(pfp_indices, pfp_branches, plot_var, ax, legend_string, color) :
     
     n_hits = ak.to_numpy(ak.flatten(pfp_branches[plot_var.tree_name][pfp_indices]))
     is_track = ak.to_numpy(ak.flatten(pfp_branches['BM_IsTrack'][pfp_indices]))
@@ -218,7 +251,7 @@ def PlotDiffVariable(indices_or_mask, branches, plot_diff_var, ax, label, color)
 ##############################################################################################
 ##############################################################################################
 
-def PlotEfficiency(target_mask_or_indices, reco_mask_or_indices, pfp_branches, plot_var, fig, ax, color, legend_string) :
+def PlotEfficiency(target_mask_or_indices, reco_mask_or_indices, pfp_branches, plot_var, ax, legend_string, color) :
     
     target_entries = ak.to_numpy(ak.flatten(pfp_branches[plot_var.tree_name][target_mask_or_indices]))
     reco_entries = ak.to_numpy(ak.flatten(pfp_branches[plot_var.tree_name][reco_mask_or_indices]))
@@ -251,11 +284,6 @@ def PlotEfficiency(target_mask_or_indices, reco_mask_or_indices, pfp_branches, p
     ax.legend(loc='center right')
 
     return [efficiency, efficiency_err, edges]
-
-    # ax.scatter(bin_centers, efficiency, color=color, label=f' {legend_string} ')
-
-        # file_name = f'Efficiency_{plot_var.tree_name}_{Definitions.tier_strings[tier]}'
-        # fig.savefig(f'{plot_dir}{file_name}.pdf', bbox_inches='tight')
 
 ##############################################################################################
 ##############################################################################################

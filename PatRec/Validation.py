@@ -3,14 +3,14 @@ import argparse
 import uproot
 import numpy as np
 import awkward as ak
+import os
 
 import Definitions
 import Variables
-#import ValidationFunc
 import EventValidationFunc
 import HierarchyValidationFunc
-
-import os
+import ShowerValidationFunc
+import TrackValidationFunc
 
 def main(args) :
 
@@ -36,11 +36,20 @@ def main(args) :
 
     pfp_branches = pfp_tree.arrays(['MCP_TruePDG', 'BM_VertexAcc', 'MCP_TrueVisEnergy', 
                                     'MCP_NMCHits2D', 'MCP_NMCHitsU', 'MCP_NMCHitsV', 'MCP_NMCHitsW',
+                                    'BM_IsTrack', 'BM_IsShower',
                                     'BM_Completeness', 'BM_Purity'], library="ak")
 
-    shower_branches = shower_tree.arrays(['BM_InitialCompleteness'], library="ak")
+    shower_branches = shower_tree.arrays(['MCP_TrueCoreLengthFromU', 'MCP_TrueCoreLengthFromV', 'MCP_TrueCoreLengthFromW',
+                                          'BM_RecoCoreLength', 'BM_RecoLength', 'BM_MoliereRadius',
+                                          'BM_DirAcc',
+                                          'MCP_InitialMCHits', 'MCP_InitialMCHitsU', 'MCP_InitialMCHitsV', 'MCP_InitialMCHitsW',
+                                          'BM_InitialPfoHits', 'BM_InitialPfoHitsU', 'BM_InitialPfoHitsV', 'BM_InitialPfoHitsW',
+                                          'BM_InitialCompleteness', 'BM_InitialCompletenessU', 'BM_InitialCompletenessV', 'BM_InitialCompletenessW',
+                                          'BM_InitialPurity', 'BM_InitialPurityU', 'BM_InitialPurityV', 'BM_InitialPurityW'], library="ak")    
 
-    track_branches = track_tree.arrays(['BM_EndpointAcc'], library="ak")
+    track_branches = track_tree.arrays(['BM_EndpointAcc', 'BM_EndpointCompleteness', 'BM_EndpointPurity', 
+                                        'MCP_HasMichel', 'MCP_HasTargetMichel', 'BM_IsMichelRecod', 'MCP_MichelIndex', 
+                                        'BM_MichelIsChild', 'BM_MichelIsShower', 'MCP_MichelFromMuon', 'MCP_EndpointsMCHits'], library="ak")    
 
     hierarchy_branches = hierarchy_tree.arrays(['MC_HierarchyTier', 'MC_ParentIndex', 'BM_HierarchyTier', 'BM_ParentIndex'], library="ak")
 
@@ -67,6 +76,17 @@ def main(args) :
     # Hierarchy Validation Plots
     hierarchy_plot_dir = f'{args.plot_dir}/HierarchyValidation/'
     HierarchyValidationFunc.run_hierarchy_validation(hierarchy_plot_dir, pfp_target_mask, pfp_reco_mask, int_masks_broadcast, tier_masks, pdg_masks, hierarchy_branches, pfp_branches)
+
+    # Shower Validation Plots
+    shower_plot_dir = f'{args.plot_dir}/ShowerValidation/'
+    ShowerValidationFunc.run_shower_validation(shower_plot_dir, pfp_target_mask, pfp_reco_mask, int_masks_broadcast, tier_masks, pdg_masks, shower_branches)
+
+    # Track Validation Plots
+    track_plot_dir = f'{args.plot_dir}/TrackValidation/Track'
+    TrackValidationFunc.run_track_validation(track_plot_dir, pfp_target_mask, pfp_reco_mask, int_masks_broadcast, tier_masks, pdg_masks, track_branches)
+    for michel_type in Definitions.michel_types :
+            michel_plot_dir = f'{args.plot_dir}/TrackValidation/Michel/{Definitions.michel_type_strings[michel_type]}'
+            TrackValidationFunc.run_michel_validation(michel_plot_dir, pfp_target_mask, pfp_reco_mask, int_masks_broadcast, tier_masks, pdg_masks, hierarchy_branches, pfp_branches, track_branches, michel_type)
     
 ##########################################################################################################
 ##########################################################################################################
@@ -84,7 +104,27 @@ def create_directory_structure(plot_dir) :
     # HierarchyTree
     create_tree_directory(plot_dir, 'HierarchyValidation')
 
+    # ShowerTree
+    create_tree_directory(plot_dir, 'ShowerValidation')
+    create_subdirectory(f'{plot_dir}/ShowerValidation', 'MC', Variables.Shower_MCP_plotting_vars)
+    create_subdirectory(f'{plot_dir}/ShowerValidation', 'BM', Variables.Shower_BM_plotting_vars)
+    create_subdirectory(f'{plot_dir}/ShowerValidation', 'Diff', Variables.Shower_diff_plotting_vars)
 
+    # TrackTree
+    create_tree_directory(plot_dir, 'TrackValidation')    
+    create_tree_directory(f'{plot_dir}/TrackValidation', 'Track')
+    create_subdirectory(f'{plot_dir}/TrackValidation/Track', 'MC', Variables.Track_MCP_plotting_vars)
+    create_subdirectory(f'{plot_dir}/TrackValidation/Track', 'BM', Variables.Track_BM_plotting_vars)
+    create_tree_directory(f'{plot_dir}/TrackValidation', 'Michel')
+    for michel_type in Definitions.michel_types :
+        create_tree_directory(f'{plot_dir}/TrackValidation/Michel', Definitions.michel_type_strings[michel_type])
+        create_tree_directory(f'{plot_dir}/TrackValidation/Michel/{Definitions.michel_type_strings[michel_type]}', 'Efficiency')
+        create_tree_directory(f'{plot_dir}/TrackValidation/Michel/{Definitions.michel_type_strings[michel_type]}', 'Hierarchy')
+        create_subdirectory(f'{plot_dir}/TrackValidation/Michel/{Definitions.michel_type_strings[michel_type]}', 'MC', Variables.Michel_MCP_plotting_vars)
+        create_subdirectory(f'{plot_dir}/TrackValidation/Michel/{Definitions.michel_type_strings[michel_type]}', 'TrackShower', Variables.Michel_track_shower_vars)
+        create_subdirectory(f'{plot_dir}/TrackValidation/Michel/{Definitions.michel_type_strings[michel_type]}', 'Efficiency', Variables.Michel_efficiency_vars)
+
+    
 ##########################################################################################################
 ##########################################################################################################
     
