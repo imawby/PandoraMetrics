@@ -9,6 +9,7 @@ import Definitions
 import Variables
 import EventValidationFunc
 import HierarchyValidationFunc
+import PFPValidationFunc
 import ShowerValidationFunc
 import TrackValidationFunc
 
@@ -38,6 +39,15 @@ def main(args) :
                                     'MCP_NMCHits2D', 'MCP_NMCHitsU', 'MCP_NMCHitsV', 'MCP_NMCHitsW',
                                     'BM_IsTrack', 'BM_IsShower',
                                     'BM_Completeness', 'BM_Purity'], library="ak")
+
+    pfp_branches = pfp_tree.arrays(['MCP_TruePDG', 'MCP_TrueEnergy', 'MCP_TrueVisEnergy', 'MCP_TrueThetaXZ', 'MCP_TrueThetaYZ',
+                                    'MCP_NMCHits2D', 'MCP_NMCHitsU', 'MCP_NMCHitsV', 'MCP_NMCHitsW',
+                                    'MCP_HasMatch', 'MCP_Length', 'MCP_Displacement',
+                                    'BM_IsTrack', 'BM_IsShower',
+                                    'BM_Completeness', 'BM_CompletenessU', 'BM_CompletenessV', 'BM_CompletenessW',
+                                    'BM_Purity', 'BM_PurityU', 'BM_PurityV', 'BM_PurityW',
+                                    'BM_VertexAcc', 'BM_Length', 'BM_Displacement',
+                                    'ALT_Completeness', 'ALT_Purity', 'ALT_PDG', 'ALT_IsUpstreamHierarchy', 'ALT_IsSameMC'], library="ak")    
 
     shower_branches = shower_tree.arrays(['MCP_TrueCoreLengthFromU', 'MCP_TrueCoreLengthFromV', 'MCP_TrueCoreLengthFromW',
                                           'BM_RecoCoreLength', 'BM_RecoLength', 'BM_MoliereRadius',
@@ -77,6 +87,10 @@ def main(args) :
     hierarchy_plot_dir = f'{args.plot_dir}/HierarchyValidation/'
     HierarchyValidationFunc.run_hierarchy_validation(hierarchy_plot_dir, pfp_target_mask, pfp_reco_mask, int_masks_broadcast, tier_masks, pdg_masks, hierarchy_branches, pfp_branches)
 
+    # PFP Validation Plots
+    pfp_plot_dir = f'{args.plot_dir}/PFPValidation/'
+    PFPValidationFunc.run_pfp_validation(pfp_plot_dir, pfp_target_mask, pfp_reco_mask, int_masks, tier_masks, pdg_masks, pfp_branches)
+
     # Shower Validation Plots
     shower_plot_dir = f'{args.plot_dir}/ShowerValidation/'
     ShowerValidationFunc.run_shower_validation(shower_plot_dir, pfp_target_mask, pfp_reco_mask, int_masks_broadcast, tier_masks, pdg_masks, shower_branches)
@@ -100,9 +114,24 @@ def create_directory_structure(plot_dir) :
     create_subdirectory(f'{plot_dir}/EventValidation', 'MC', Variables.Event_MCP_plotting_vars)
     create_subdirectory(f'{plot_dir}/EventValidation', 'Reco', Variables.Event_Reco_plotting_vars)
     create_subdirectory(f'{plot_dir}/EventValidation', 'Diff', Variables.Event_diff_plotting_vars + [Variables.vtx_dr_all, Variables.vtx_dr_only_reco])
-
+    
     # HierarchyTree
     create_tree_directory(plot_dir, 'HierarchyValidation')
+
+    # PFPTree
+    create_tree_directory(plot_dir, 'PFPValidation')
+    create_tree_directory(f'{plot_dir}/PFPValidation', 'Efficiency')
+    create_subdirectory(f'{plot_dir}/PFPValidation', 'MC', Variables.PFP_MCP_plotting_vars)
+    create_subdirectory(f'{plot_dir}/PFPValidation', 'BM', Variables.PFP_BM_plotting_vars)
+    create_subdirectory(f'{plot_dir}/PFPValidation', 'Diff', Variables.PFP_diff_plotting_vars)
+    create_subdirectory(f'{plot_dir}/PFPValidation', 'Alt', Variables.PFP_ALT_plotting_vars)
+    for plot_var in Variables.PFP_ALT_plotting_vars :
+        create_subdirectory(f'{plot_dir}/PFPValidation/Alt', f'{plot_var.dir_name}_Seg', Variables.ALT_seg_vars)
+    
+    create_subdirectory(f'{plot_dir}/PFPValidation', 'XProfile', Variables.PFP_profile_vars)    
+    create_subdirectory(f'{plot_dir}/PFPValidation', 'TrackShower', Variables.PFP_track_shower_plotting_vars)
+    create_subdirectory(f'{plot_dir}/PFPValidation', 'Efficiency', Variables.PFP_efficiency_vars)
+    create_subdirectory(f'{plot_dir}/PFPValidation', '2D', Variables.PFP_2D_vars)    
 
     # ShowerTree
     create_tree_directory(plot_dir, 'ShowerValidation')

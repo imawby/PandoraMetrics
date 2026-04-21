@@ -20,15 +20,15 @@ class PlotDiffVar :
         self.n_bins = n_bins  
 
 class SegVar :
-    def __init__(self, dir_name, tree_name, label, options, colors):
+    def __init__(self, dir_name, tree_name, options, colors):
         self.dir_name = dir_name
         self.tree_name = tree_name
-        self.label = label
         self.options = options
         self.colors = colors
 
-class ProfileVar :
-    def __init__(self, plot_var_x, plot_var_y):
+class TwoVar :
+    def __init__(self, dir_name, plot_var_x, plot_var_y):
+        self.dir_name = dir_name
         self.plot_var_x = plot_var_x
         self.plot_var_y = plot_var_y     
         
@@ -46,24 +46,22 @@ Event_MCP_plotting_vars = [nu_true_energy, nu_vis_true_energy]
 Event_Reco_plotting_vars = [nu_vertex_accuracy]
 
 # PFP
-# completeness_var = PlotVar('BM_Completeness', 'Completeness', 'Frac. of MCParticles', [0,1.0], 40)
-# purity_var = PlotVar('BM_Purity', 'Purity', 'Frac. of MCParticles', [0,1.0], 40)
-# alt_completeness_var = PlotVar('ALT_Completeness', 'AltCompleteness', 'Frac. of MCParticles', [-1.01, 1.0], 40)
-# alt_purity_var = PlotVar('ALT_Purity', 'AltPurity', 'Frac. of MCParticles', [-1.01, 1.0], 40)
-# n_mc_hits_2d_var = PlotVar('MCP_NMCHits2D', 'NMCHits2D', 'Frac. of PFParticles', [0, 1500], 30)
-# mc_displacement_var = PlotVar('MCP_Displacement', 'MC Displacement [cm]', 'Frac. of PFParticles', [0, 100], 10)
-# theta_xz_var = PlotVar('MCP_TrueThetaXZ', 'ThetaXZ', 'Frac. of PFParticles', [-3.5, 3.5], 25)
-# theta_yz_var = PlotVar('MCP_TrueThetaYZ', 'ThetaYZ', 'Frac. of PFParticles', [-1.6, 1.6], 12)
-# pfo_energy_var = PlotVar('MCP_TrueEnergy', 'True Particle Energy', 'Frac. of PFParticles', [0,3], 50)
-# true_vis_energy = PlotVar('MCP_TrueVisEnergy', 'True Visible Energy', 'Frac. of PFParticles', [0,2], 20)
-# pfo_signed_vertex_acc_var = PlotVar('BM_VertexAcc', 'Signed Vertex deltaR [cm]', 'Frac. of PFParticles', [-25,25], 25)
-# multiplicity_var = PlotVar('MCNu_Multiplicity', 'N Reco Targets in Event', 'Frac. of PFParticles', [0,50], 50)    
-# shower_multiplicity_var = PlotVar('MCNu_ShowerMultiplicity', 'N Reco Targets in Event', 'Frac. of PFParticles', [0,20], 20)
-# PFP_MCP_plotting_vars = [completeness_var, purity_var, n_mc_hits_2d_var, true_vis_energy, multiplicity_var, shower_multiplicity_var, theta_xz_var, theta_yz_var]
-# PFP_BM_plotting_vars = [pfo_signed_vertex_acc_var]
-# PFP_ALT_plotting_vars = [alt_completeness_var, alt_purity_var]
-# PFP_track_shower_plotting_vars = [n_mc_hits_2d_var, theta_xz_var, theta_yz_var]
-# PFP_efficiency_vars = [n_mc_hits_2d_var, theta_xz_var, theta_yz_var, true_vis_energy, multiplicity_var, shower_multiplicity_var, mc_displacement_var]
+completeness = PlotVar('Completeness', 'BM_Completeness', 'Completeness', 'Frac. of MCParticles', [0,1.0], 40)
+purity = PlotVar('Purity', 'BM_Purity', 'Purity', 'Frac. of MCParticles', [0,1.0], 40)
+alt_completeness = PlotVar('AltCompleteness', 'ALT_Completeness', 'AltCompleteness', 'Frac. of MCParticles', [-1.01, 1.0], 40)
+alt_purity = PlotVar('AltPurity', 'ALT_Purity', 'AltPurity', 'Frac. of MCParticles', [-1.01, 1.0], 40)
+n_mc_hits_2d = PlotVar('NMCHits2D', 'MCP_NMCHits2D', 'NMCHits2D', 'Frac. of PFParticles', [0, 1500], 30)
+mc_displacement = PlotVar('Displacement', 'MCP_Displacement', 'MC Displacement [cm]', 'Frac. of PFParticles', [0, 100], 10)
+theta_xz = PlotVar('ThetaXZ', 'MCP_TrueThetaXZ', 'ThetaXZ', 'Frac. of PFParticles', [-3.5, 3.5], 25)
+theta_yz = PlotVar('ThetaYZ', 'MCP_TrueThetaYZ', 'ThetaYZ', 'Frac. of PFParticles', [-1.6, 1.6], 12)
+pfo_energy = PlotVar('TrueEnergy', 'MCP_TrueEnergy', 'True Particle Energy', 'Frac. of PFParticles', [0,3], 50)
+true_vis_energy = PlotVar('TrueVisEnergy', 'MCP_TrueVisEnergy', 'True Visible Energy', 'Frac. of PFParticles', [0,2], 20)
+pfo_signed_vertex_acc = PlotVar('VertexAcc', 'BM_VertexAcc', 'Signed Vertex deltaR [cm]', 'Frac. of PFParticles', [-25,25], 25)
+PFP_MCP_plotting_vars = [completeness, purity, n_mc_hits_2d, true_vis_energy, theta_xz, theta_yz]
+PFP_BM_plotting_vars = [pfo_signed_vertex_acc]
+PFP_ALT_plotting_vars = [alt_completeness, alt_purity]
+PFP_track_shower_plotting_vars = [n_mc_hits_2d, theta_xz, theta_yz]
+PFP_efficiency_vars = [n_mc_hits_2d, theta_xz, theta_yz, true_vis_energy, mc_displacement]
 
 # Michel
 michel_true_vis_energy = PlotVar('TrueVisEnergy', 'MCP_TrueVisEnergy', 'True Visible Energy', 'Frac. of Michels', [0,0.1], 20)
@@ -97,9 +95,9 @@ Shower_BM_plotting_vars = [shower_dir_acc, shower_moliere]
 ############################################### 
 
 # # PFP
-# length_diff_var = PlotDiffVar('MCP_Length', 'BM_Length', 'TrueRecoLength', 'Frac. of PFParticles', [-100, 100], 50)
-# displacement_diff_var = PlotDiffVar('MCP_Displacement', 'BM_Displacement', 'True-Reco Displacement', 'Frac. of PFParticles', [-20, 20], 20)
-# PFP_diff_plotting_vars = [length_diff_var, displacement_diff_var]
+length_diff_var = PlotDiffVar('DeltaLength', 'MCP_Length', 'BM_Length', 'TrueRecoLength', 'Frac. of PFParticles', [-100, 100], 50)
+displacement_diff_var = PlotDiffVar('DeltaDisplacement', 'MCP_Displacement', 'BM_Displacement', 'True-Reco Displacement', 'Frac. of PFParticles', [-20, 20], 20)
+PFP_diff_plotting_vars = [length_diff_var, displacement_diff_var]
 
 # Shower
 core_length_diff = PlotDiffVar('DeltaCoreLengthFromW', 'MCP_TrueCoreLengthFromW', 'BM_RecoCoreLength', 'True-Reco Core Length (from W) [cm]', 'Frac. of Reco Showers', [-50, 50], 50)
@@ -116,34 +114,26 @@ Event_diff_plotting_vars = [nu_vtx_delta_x, nu_vtx_delta_y, nu_vtx_delta_z]
 ############################################### 
 
 # ALT
-# alt_pfp_seg_var = SegVar('ALT_PDG', 'PDG', [13, 2212, 211, 777, 22, 11, 111], ["Blue", "tab:green", "tab:pink", 'tab:purple', "tab:orange", "Red", "tab:olive"])
-# alt_is_up_hierarchy_seg_var = SegVar('ALT_IsUpstreamHierarchy', 'IsUpHierarchy', [-1, 0, 1], ["tab:gray", "red", "green"]) 
-# alt_is_same_mc_var = SegVar('ALT_IsSameMC', 'IsSameMC', [-1, 0, 1], ["tab:gray", "red", "green"]) 
-# ALT_seg_vars = [alt_pfp_seg_var, alt_is_up_hierarchy_seg_var, alt_is_same_mc_var]
+alt_pfp_seg_var = SegVar('PDG', 'ALT_PDG', [13, 2212, 211, 777, 22, 11, 111], ["Blue", "tab:green", "tab:pink", 'tab:purple', "tab:orange", "Red", "tab:olive"])
+alt_is_up_hierarchy_seg_var = SegVar('IsUpstreamHierarchy', 'ALT_IsUpstreamHierarchy', [-1, 0, 1], ["tab:gray", "red", "green"]) 
+alt_is_same_mc_var = SegVar('IsSameMC', 'ALT_IsSameMC', [-1, 0, 1], ["tab:gray", "red", "green"]) 
+ALT_seg_vars = [alt_pfp_seg_var, alt_is_up_hierarchy_seg_var, alt_is_same_mc_var]
 
 ###############################################
-# ProfileVar
+# TwoVar
 ###############################################
-# pfp_completeness_true_vis_energy = ProfileVar(true_vis_energy, completeness_var)
-# pfp_completeness_multiplicity = ProfileVar(multiplicity_var, completeness_var)
-# pfp_completeness_shower_multiplicity = ProfileVar(shower_multiplicity_var, completeness_var)
-# pfp_completeness_n_mc_hits = ProfileVar(n_mc_hits_2d_var, completeness_var)
-# pfp_purity_true_vis_energy = ProfileVar(true_vis_energy, purity_var)
-# pfp_purity_multiplicity = ProfileVar(multiplicity_var, purity_var)
-# pfp_purity_shower_multiplicity = ProfileVar(shower_multiplicity_var, purity_var)
-# pfp_purity_n_mc_hits = ProfileVar(n_mc_hits_2d_var, purity_var)
+# PFP
+pfp_completeness_true_vis_energy = TwoVar('Completeness_VisEnergy', true_vis_energy, completeness)
+pfp_completeness_n_mc_hits = TwoVar('Completeness_NMCHits2D', n_mc_hits_2d, completeness)
+pfp_purity_true_vis_energy = TwoVar('Purity_VisEnergy', true_vis_energy, purity)
+pfp_purity_n_mc_hits = TwoVar('Purity_NMCHits2D', n_mc_hits_2d, purity)
 
-# PFP_profile_vars = [pfp_completeness_true_vis_energy, pfp_completeness_multiplicity, pfp_completeness_shower_multiplicity, pfp_completeness_n_mc_hits,
-#                     pfp_purity_true_vis_energy, pfp_purity_multiplicity, pfp_purity_shower_multiplicity, pfp_purity_n_mc_hits]
-
+PFP_profile_vars = [pfp_completeness_true_vis_energy, pfp_completeness_n_mc_hits,
+                    pfp_purity_true_vis_energy, pfp_purity_n_mc_hits]
 
 ###############################################
 # 2D Var
 ###############################################
-# completeness_2D_var = PlotVar('BM_Completeness', 'Completeness', 'Frac. of MCParticles', [0,1.0], 4)
-# purity_2D_var = PlotVar('BM_Purity', 'Purity', 'Frac. of MCParticles', [0,1.0], 4)
-
-# PFP_2D_vars = [[completeness_2D_var, purity_2D_var]]
-
-
-
+# PFP
+completeness_purity_var = TwoVar('Completeness_Purity', completeness, purity)
+PFP_2D_vars = [completeness_purity_var]

@@ -18,7 +18,7 @@ class PlotConfig :
 ##############################################################################################
 ##############################################################################################
 
-def configure_plot(fig, ax, plot_var, int_string="", tier_string="", pdg_string="") :
+def configure_plot(fig, ax, int_string="", tier_string="", pdg_string="") :
 
     title = '       '
     if (int_string) :
@@ -28,8 +28,6 @@ def configure_plot(fig, ax, plot_var, int_string="", tier_string="", pdg_string=
     if (pdg_string) :
         title += f' - {pdg_string}'    
     ax.set_title(title)
-    ax.set_xlabel(plot_var.x_label)
-    ax.set_ylabel(plot_var.y_label)
     ax.grid(True)
     ax.tick_params(labelbottom=True, bottom=True, labelleft=True, left=True)
     fig.subplots_adjust(left=0.08, right=0.98, bottom=0.10, top=0.95, hspace=0.4, wspace=0.4)
@@ -44,18 +42,44 @@ def save_plot(fig, path) :
 ##############################################################################################
 ##############################################################################################    
 
-
 def create_plots(masks, branches, plot_func, plot_vars, sub_dir, plot_config) :
     for plot_var in plot_vars :
         fig, ax = plt.subplots()
-        configure_plot(fig, ax, plot_var, int_string=plot_config.int_string, pdg_string=plot_config.pdg_string)
+        configure_plot(fig, ax, int_string=plot_config.int_string, pdg_string=plot_config.pdg_string)
         
         if len(masks) == 1 :
             plot_func(next(iter(masks.values())), branches, plot_var, ax, plot_config.pdg_string, plot_config.color)
         else :
             plot_func(masks['target'], masks['reco'], branches, plot_var, ax, plot_config.pdg_string, plot_config.color)
             
-        save_plot(fig, f'{sub_dir}/{plot_var.dir_name}/{plot_config.file_name}.pdf')      
+        save_plot(fig, f'{sub_dir}/{plot_var.dir_name}/{plot_config.file_name}.pdf')
+
+
+##############################################################################################
+##############################################################################################    
+
+def segment_plot_vars(masks, branches, plot_func, plot_vars, seg_vars, sub_dir, plot_config) :
+
+    for plot_var in plot_vars :
+        for seg_var in seg_vars :
+            fig, ax = plt.subplots()
+            configure_plot(fig, ax, int_string=plot_config.int_string, pdg_string=plot_config.pdg_string)
+
+            if len(masks) == 1 :
+                plot_func(next(iter(masks.values())), branches, plot_var, seg_var, ax)
+
+            save_plot(fig, f'{sub_dir}/{plot_var.dir_name}_Seg/{seg_var.dir_name}/{plot_config.file_name}.pdf')
+
+#####################################################################################################################################################
+#####################################################################################################################################################
+
+def SegmentAltVar(target_mask, pfp_branches, plot_var, seg_var, ax):
+
+    n_entries = ak.count_nonzero(target_mask)
+    
+    for index in range(len(seg_var.options)) :
+        mask = target_mask & (pfp_branches[seg_var.tree_name] == seg_var.options[index])
+        PlotVariable(mask, pfp_branches, plot_var, ax, f'{seg_var.options[index]}', seg_var.colors[index], fill=False, n_entries=n_entries)
 
 ##############################################################################################
 ##############################################################################################
@@ -78,6 +102,9 @@ def TrackShowerAsAFunctionOf(pfp_indices, pfp_branches, plot_var, ax, legend_str
     bin_centers = 0.5 * (edges[1:] + edges[:-1])
     ax.errorbar(bin_centers, proportion_shower, yerr=err_shower, marker='x', capsize=2, label=(f'{legend_string} - Shower'))
     ax.errorbar(bin_centers, proportion_track, yerr=err_track, marker='x', capsize=2, label=(f'{legend_string} - Track'))
+
+    ax.set_xlabel(plot_var.x_label)
+    ax.set_ylabel(plot_var.y_label)    
     ax.legend(loc='center right')
     
 ##############################################################################################
@@ -109,15 +136,17 @@ def PlotVariable(indices_or_mask, branches, plot_var, ax, label, color, fill=Tru
         ax.fill_between(bin_centers,hist_fraction,step='mid',color=color,alpha=0.3)
     ax.errorbar(bin_centers, hist_fraction, yerr=hist_error, fmt='none', ecolor=color, capsize=2)
 
-    # if (len(label) != 0) :
-    #     ax.legend()
+    ax.set_xlabel(plot_var.x_label)
+    ax.set_ylabel(plot_var.y_label)
 
     return [hist_fraction, hist_error, bin_edges]
 
 ##############################################################################################
 ##############################################################################################
 
-def Plot2DHist(indices_or_mask, branches, plot_var_x, plot_var_y, ax):
+def Plot2DHist(indices_or_mask, branches, two_plot_var, ax, label, color) :
+    plot_var_x = two_plot_var.plot_var_x
+    plot_var_y = two_plot_var.plot_var_y
     target_x_entries = branches[plot_var_x.tree_name][indices_or_mask]
     target_y_entries = branches[plot_var_y.tree_name][indices_or_mask]
 
@@ -139,6 +168,10 @@ def Plot2DHist(indices_or_mask, branches, plot_var_x, plot_var_y, ax):
     )
 
     n_entries = len(target_x_entries)
+    
+    if (n_entries == 0) :
+        return
+    
     hist_fraction = hist_counts / n_entries
 
     # Plot as colored mesh
@@ -218,6 +251,7 @@ def PlotProfileX(indices_or_mask, branches, profile_var, ax, label, color):
         markersize=4, capsize=3, label=label, color='black')
 
     ax.set_ylabel(f"Mean {profile_var.plot_var_y.x_label}")
+    ax.set_xlabel(profile_var.plot_var_x.x_label)
     ax.set_ylim(profile_var.plot_var_y.range)
     ax.grid(True)
     
@@ -245,6 +279,8 @@ def PlotDiffVariable(indices_or_mask, branches, plot_diff_var, ax, label, color)
         return
     
     weights = np.ones(n_target_entries) * (1.0 / n_target_entries)
+    ax.set_xlabel(plot_diff_var.x_label)
+    ax.set_ylabel(plot_diff_var.y_label)
     ax.hist(target_entries, bins=plot_diff_var.n_bins, range=plot_diff_var.range, weights=weights, histtype='step', color=color, linewidth=1, label=(f' {label} '))
     ax.legend()
 
@@ -271,6 +307,7 @@ def PlotEfficiency(target_mask_or_indices, reco_mask_or_indices, pfp_branches, p
 
     bin_centers = 0.5 * (edges[1:] + edges[:-1])
     ax.errorbar(bin_centers, efficiency, yerr=efficiency_err, fmt='x-', color='black', capsize=3, label=f' {legend_string} ')
+    ax.set_xlabel(plot_var.x_label)
     ax.set_ylabel('Efficiency')
     ax.set_ylim([0, 1.0])
     ax.grid(True)
@@ -421,17 +458,6 @@ def CalculateEfficiencyMetrics(target_mask_or_indices, reco_mask_or_indices, is_
     efficiency_metrics['NReco'] = n_reco
     efficiency_metrics['Efficiency'] = reco_efficiency
     return efficiency_metrics
-
-##############################################################################################
-##############################################################################################
-
-# def PrintEfficiencyTableEntry(tier, efficiency_metrics, file) :
-
-#     print(' ' + str(Definitions.tier_strings[tier]) + str(' '* (10 - len(str(Definitions.tier_strings[tier])))) +
-#                                             '|' + str(efficiency_metrics['NTarget']) + str(' '* (19 - len(str(efficiency_metrics['NTarget'])))) + \
-#                                             '|' + str(efficiency_metrics['NReco']) + str(' '* (19 - len(str(efficiency_metrics['NReco'])))) + \
-#                                             '|' + str(efficiency_metrics['Efficiency']) + str(' '* (12 - len(str(efficiency_metrics['Efficiency'])))) + \
-#                                             '|', file=file)
 
 ##############################################################################################
 ##############################################################################################
