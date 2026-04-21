@@ -4,8 +4,9 @@ import numpy as np
 import uproot
 import awkward as ak
 import matplotlib.pyplot as plt
-import Plots
 import os
+
+import Plots
 
 def main(args) :
 
@@ -42,6 +43,13 @@ def main(args) :
                                   'RecoShowerPandrizzleModularNuVertexChargeWeightedMeanRadialDistance',
                                   'RecoShowerPandrizzleModularMaxNShowerHits'], library='ak')
 
+    ##############
+    # Global masks
+    ##############
+    completeness_mask = (nusel_branches['RecoPFPRecoCompleteness'] > args.completeness_thr)
+    purity_mask = (nusel_branches['RecoPFPRecoHitPurity'] > args.purity_thr)
+    hit_mask = (nusel_branches['RecoPFPRecoNHits'] > args.hit_thr)
+    
     ############################################################
     # Pandizzle variables - Categories + binning match my thesis
     ############################################################
@@ -60,7 +68,7 @@ def main(args) :
     track_conicalness_PV =  Plots.PlotVar('', 'Tracks', 'Conicalness [stupid units]', [0, 5], 20)
 
     # Target mask
-    muon_target_mask = (nusel_branches['RecoPFPTruePrimary'] == 1) & (nusel_branches['RecoPFPIsPrimary'] == 1) & (nusel_branches['RecoPFPTrackShowerScore'] > 0.5)
+    muon_target_mask = (nusel_branches['RecoPFPTruePrimary'] == 1) & (nusel_branches['RecoPFPIsPrimary'] == 1) & (nusel_branches['RecoPFPTrackShowerScore'] > 0.5) & completeness_mask & purity_mask & hit_mask
 
     # Apply to arrays
     true_pdg = ak.to_numpy(ak.flatten(nusel_branches['RecoPFPTruePDG'][muon_target_mask]))
@@ -104,7 +112,6 @@ def main(args) :
     Plots.PlotSignalBackgroundVar(track_eval_ratio, muon_signal_mask, ~muon_signal_mask, track_eval_ratio_PV, ax[1][1], x_label=track_eval_ratio_PV.x_label, title='', show_under_over_flow=True)
     Plots.save_plot(fig, f'{pandizzle_vars_plot_dir}/WarwickPIDVars.pdf')
 
-
     ############################################################
     # Pandrizzle variables - Categories + binning match my thesis
     ############################################################
@@ -120,7 +127,7 @@ def main(args) :
     shower_conicalness_PV =  Plots.PlotVar('', 'Tracks', 'Conicalness [stupid units]', [0, 20], 40)
 
     # Target mask
-    electron_target_mask = (nusel_branches['RecoPFPTruePrimary'] == 1) & (nusel_branches['RecoPFPIsPrimary'] == 1) & (nusel_branches['RecoPFPTrackShowerScore'] < 0.5) & (nusel_branches['RecoPFPTrackShowerScore'] > 0.0)
+    electron_target_mask = (nusel_branches['RecoPFPTruePrimary'] == 1) & (nusel_branches['RecoPFPIsPrimary'] == 1) & (nusel_branches['RecoPFPTrackShowerScore'] < 0.5) & (nusel_branches['RecoPFPTrackShowerScore'] > 0.0) & completeness_mask & purity_mask & hit_mask
 
     # Apply to arrays
     true_pdg = ak.to_numpy(ak.flatten(nusel_branches['RecoPFPTruePDG'][electron_target_mask]))
@@ -175,7 +182,7 @@ def main(args) :
     amb_hit_energy_PV = Plots.PlotVar('', 'Showers', 'Ambiguous Hit Unaccounted Energy [MeV]', [-10.0, 5.0], 30)
 
     cp_target_mask = (nusel_branches['RecoPFPTruePrimary'] == 1) & (nusel_branches['RecoPFPIsPrimary'] == 1) &\
-        (nusel_branches['RecoPFPTrackShowerScore'] < 0.5) & (nusel_branches['RecoShowerPandrizzlePathwayLengthMin'] > -990) & (nusel_branches['RecoPFPTrackShowerScore'] > 0.0)
+        (nusel_branches['RecoPFPTrackShowerScore'] < 0.5) & (nusel_branches['RecoShowerPandrizzlePathwayLengthMin'] > -990) & (nusel_branches['RecoPFPTrackShowerScore'] > 0.0) & completeness_mask & purity_mask & hit_mask
 
     # Apply to arrays
     true_pdg = ak.to_numpy(ak.flatten(nusel_branches['RecoPFPTruePDG'][cp_target_mask]))
@@ -236,7 +243,7 @@ def main(args) :
 
     modular_target_mask = (nusel_branches['RecoPFPTruePrimary'] == 1) & (nusel_branches['RecoPFPIsPrimary'] == 1) &\
         (nusel_branches['RecoPFPTrackShowerScore'] < 0.5) & (nusel_branches['RecoShowerPandrizzleModularPathwayLength'] > -990) &\
-        (nusel_branches['RecoPFPTrackShowerScore'] > 0.0)
+        (nusel_branches['RecoPFPTrackShowerScore'] > 0.0) & completeness_mask & purity_mask & hit_mask
 
     # Apply to arrays
     true_pdg = ak.to_numpy(ak.flatten(nusel_branches['RecoPFPTruePDG'][modular_target_mask]))
@@ -277,10 +284,12 @@ def create_directory(root_dir, dir_name) :
 ##########################################################################################################
             
 def parse_cli():
-    # Set up argument parser
     parser = argparse.ArgumentParser(description="Validation script for Pandora.")
     parser.add_argument("--plot_dir", type=str, required=True, help="Directory for storing plots.")
     parser.add_argument("--input_file", type=str, required=True, help="Path to the input file.")
+    parser.add_argument("--completeness_thr", type=float, required=False, default=0.0, help="Completeness threshold.")
+    parser.add_argument("--purity_thr", type=float, required=False, default=0.0, help="Purity threshold.")
+    parser.add_argument("--hit_thr", type=float, required=False, default=0.0, help="NHit2D threshold.")    
     return parser.parse_args()
 
 ##########################################################################################################

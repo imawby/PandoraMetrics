@@ -123,8 +123,7 @@ def main(args) :
     pandizzle_pid = PIDMethod('IzzleSelection', 'Pandizzle', 1, ['RecoTrackPandizzleVar'], [13], 'Tracks', [-1.0, 1.0], 40)
     enhanced_pandrizzle_pid = PIDMethod('IzzleSelection', 'EnhancedPandrizzle', 1, ['RecoShowerEnhancedPandrizzleScore'], [11], 'Showers', [-1.0, 1.0], 40)
     backup_pandrizzle_pid = PIDMethod('IzzleSelection', 'BackupPandizzle', 1, ['RecoShowerBackupPandrizzleScore'], [11], 'Showers', [-1.0, 1.0], 40)
-    ivysaurus_pid = PIDMethod('IvysaurusSelection', 'Ivysaurus', 5, ['IvysaurusMuonScore', 'IvysaurusProtonScore', 'IvysaurusPionScore', 'IvysaurusElectronScore', 'IvysaurusPhotonScore'],
-                              [13, 2212, 211, 11, 22], 'Particles', [-1.0, 1.0], 40)
+    ivysaurus_pid = PIDMethod('IvysaurusSelection', 'Ivysaurus', 5, ['IvysaurusMuonScore', 'IvysaurusProtonScore', 'IvysaurusPionScore', 'IvysaurusElectronScore', 'IvysaurusPhotonScore'], [13, 2212, 211, 11, 22], 'Particles', [-1.0, 1.0], 40)
 
     for pid_var in [pandizzle_pid, enhanced_pandrizzle_pid, backup_pandrizzle_pid, ivysaurus_pid] :
 
@@ -132,7 +131,10 @@ def main(args) :
         # Define target
         #########################
         track_shower_mask = (nusel_branches['RecoPFPTrackShowerScore'] > 0.5) if pid_var.input_type_name == 'Tracks' else ((nusel_branches['RecoPFPTrackShowerScore'] > 0.0) & (nusel_branches['RecoPFPTrackShowerScore'] < 0.5)) if pid_var.input_type_name == 'Showers' else ak.ones_like(nusel_branches['RecoPFPTrackShowerScore'], dtype=bool)
-        target_mask = (nusel_branches['RecoPFPTruePrimary'] == 1) & (nusel_branches['RecoPFPIsPrimary'] == 1) & track_shower_mask
+        completeness_mask = (nusel_branches['RecoPFPRecoCompleteness'] > args.completeness_thr)
+        purity_mask = (nusel_branches['RecoPFPRecoHitPurity'] > args.purity_thr)
+        hit_mask = (nusel_branches['RecoPFPRecoNHits'] > args.hit_thr)
+        target_mask = (nusel_branches['RecoPFPTruePrimary'] == 1) & (nusel_branches['RecoPFPIsPrimary'] == 1) & track_shower_mask & completeness_mask & purity_mask & hit_mask
 
         # Get plotting arrays
         true_pdg = ak.to_numpy(ak.flatten(nusel_branches['RecoPFPTruePDG'][target_mask]))
@@ -190,6 +192,9 @@ def parse_cli():
     parser = argparse.ArgumentParser(description="Validation script for Pandora.")
     parser.add_argument("--plot_dir", type=str, required=True, help="Directory for storing plots.")
     parser.add_argument("--input_file", type=str, required=True, help="Path to the input file.")
+    parser.add_argument("--completeness_thr", type=float, required=False, default=0.0, help="Completeness threshold.")
+    parser.add_argument("--purity_thr", type=float, required=False, default=0.0, help="Purity threshold.")
+    parser.add_argument("--hit_thr", type=float, required=False, default=0.0, help="NHit2D threshold.")
     return parser.parse_args()
 
 ##########################################################################################################

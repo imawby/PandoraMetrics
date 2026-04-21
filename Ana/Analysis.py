@@ -4,13 +4,24 @@ import numpy as np
 import uproot
 import awkward as ak
 import matplotlib.pyplot as plt
+import os
 
 import Signal
 import Selection
 import Plots
 import Definitions
 
-import os
+##########################################################################################################
+##########################################################################################################
+    
+def ConvertMuonMomToEnergy(muon_mom_array) :
+    muon_mass = 0.1056583745
+    jam = np.sqrt((muon_mom_array * muon_mom_array) + (muon_mass * muon_mass))
+    jam = ak.where(muon_mom_array < -990, -999.0, jam)
+    return jam
+
+##########################################################################################################
+##########################################################################################################
 
 def main(args) :
 
@@ -232,15 +243,6 @@ def create_directory_structure(plot_dir) :
     create_directory(plot_dir, 'CVNSelection')
     create_directory(plot_dir, 'IzzleSelection')
     create_directory(plot_dir, 'IvysaurusSelection')
-
-##########################################################################################################
-##########################################################################################################
-    
-def ConvertMuonMomToEnergy(muon_mom_array) :
-    muon_mass = 0.1056583745
-    jam = np.sqrt((muon_mom_array * muon_mom_array) + (muon_mass * muon_mass))
-    jam = ak.where(muon_mom_array < -990, -999.0, jam)
-    return jam
 
 ##########################################################################################################
 ##########################################################################################################
