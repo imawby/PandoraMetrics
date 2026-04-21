@@ -29,6 +29,55 @@ def save_plot(fig, path) :
 #####################################################################################################################
 #####################################################################################################################
 
+class PlotVar :
+    def __init__(self, var_name, input_type_name, x_label, range, n_bins):
+        self.var_name = var_name
+        self.input_type_name = input_type_name
+        self.x_label = x_label
+        self.range = range
+        self.n_bins = n_bins
+    
+#####################################################################################################################
+#####################################################################################################################
+
+def PlotVariable(input_array, plot_var, ax, color, label, show_under_over_flow=False) :
+    if (show_under_over_flow) :
+        input_array[input_array < plot_var.range[0]] = plot_var.range[0]
+        input_array[input_array > plot_var.range[1]] = plot_var.range[1]
+    
+    n_entries = input_array.shape[0]
+    hist_counts, bin_edges = np.histogram(input_array, bins=plot_var.n_bins, range=plot_var.range)
+    hist_fraction = hist_counts / n_entries
+    
+    # Plot with error == sqrt(n_i)/N
+    hist_error = np.sqrt(hist_counts) / n_entries
+    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])    
+    ax.step(bin_centers, hist_fraction, where='mid', color=color, linewidth=1, label=f'{label}')
+    
+    ax.fill_between(bin_centers,hist_fraction,step='mid',color=color,alpha=0.3)
+    ax.errorbar(bin_centers, hist_fraction, yerr=hist_error, fmt='none', ecolor=color, capsize=2)
+    ax.legend()
+
+#####################################################################################################################
+#####################################################################################################################
+
+def PlotSignalBackgroundVar(flattened_branch, signal_mask, background_mask, plot_var, ax, x_label='', title='', show_under_over_flow=False) :
+    signal_var = flattened_branch[signal_mask]
+    background_var = flattened_branch[background_mask]
+
+    PlotVariable(signal_var, plot_var, ax, 'blue', 'signal', show_under_over_flow)
+    PlotVariable(background_var, plot_var, ax, 'red', 'background', show_under_over_flow)
+    
+    ax.set_title(title)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(f'Fraction of {plot_var.input_type_name}')
+    ax.grid(True)
+    ax.tick_params(labelbottom=True, bottom=True, labelleft=True, left=True)
+    ax.legend()    
+
+#####################################################################################################################
+#####################################################################################################################
+
 def PlotEnergySpectrum(nusel_branches, tree_branch, target_mask, ax, color='black', legend='', style='solid') :
     target_entries = nusel_branches[tree_branch][target_mask]
 
@@ -188,39 +237,4 @@ def PlotSelectionMetrics(nusel_branches, signal_mask, selected_mask, fig, ax, ti
     
     handles1, labels1 = ax.get_legend_handles_labels()
     handles2, labels2 = ax2.get_legend_handles_labels()
-    ax.legend(handles1 + handles2, labels1 + labels2)
-
-#####################################################################################################################
-#####################################################################################################################
-
-def PlotVariable(input_array, plot_var, ax, color, label) :
-
-    n_entries = input_array.shape[0]
-    hist_counts, bin_edges = np.histogram(input_array, bins=plot_var.n_bins, range=plot_var.range)
-    hist_fraction = hist_counts / n_entries
-    
-    # Plot with error == sqrt(n_i)/N
-    hist_error = np.sqrt(hist_counts) / n_entries
-    bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])    
-    ax.step(bin_centers, hist_fraction, where='mid', color=color, linewidth=1, label=f'{label}')
-    
-    ax.fill_between(bin_centers,hist_fraction,step='mid',color=color,alpha=0.3)
-    ax.errorbar(bin_centers, hist_fraction, yerr=hist_error, fmt='none', ecolor=color, capsize=2)
-    ax.legend()
-
-#####################################################################################################################
-#####################################################################################################################
-
-def PlotSignalBackgroundVar(flattened_branch, signal_mask, background_mask, plot_var, ax, x_label='', title='') :
-    signal_var = flattened_branch[signal_mask]
-    background_var = flattened_branch[background_mask]
-
-    PlotVariable(signal_var, plot_var, ax, 'blue', 'signal')
-    PlotVariable(background_var, plot_var, ax, 'red', 'background')
-    
-    ax.set_title(title)
-    ax.set_xlabel(x_label)
-    ax.set_ylabel(f'Fraction of {plot_var.input_type_name}')
-    ax.grid(True)
-    ax.tick_params(labelbottom=True, bottom=True, labelleft=True, left=True)
-    ax.legend()
+    ax.legend(handles1 + handles2, labels1 + labels2)    

@@ -18,7 +18,6 @@ def main(args) :
     # Handle file
     #########################
     file_name = f'{args.input_file}'
-    # file = uproot.open('/Users/isobel/Desktop/DUNE/2026/PandoraValidation/files/ccnu_retrained_shower_HD_LBL.root')
     file = uproot.open(file_name)
 
     #########################
@@ -201,6 +200,7 @@ def main(args) :
 
     #####################################
     # Plot ivysaurus selection
+    #####################################
     ivy_sel_CC_nue_mask = Selection.PassCCNueIvysaurusSelection(nusel_branches, 0.9)
     ivy_sel_CC_numu_mask = Selection.PassCCNumuIvysaurusSelection(nusel_branches)
 
